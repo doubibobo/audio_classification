@@ -1,0 +1,5 @@
+checkpoints/
+data/
+nohups/
+logs/
+*.pyc
