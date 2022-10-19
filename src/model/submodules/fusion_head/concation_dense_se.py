@@ -1,5 +1,5 @@
 import torch.nn as nn
-from src.model.fusion_head import SENet
+from src.model.submodules.fusion_head import SENet
 import torch.nn.functional as F
 
 

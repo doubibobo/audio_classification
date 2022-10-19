@@ -1,6 +1,6 @@
-from src.model.image_head.resnet import ResNet
-from src.model.text_head.gru import GRUModel
-from src.model.text_head.lstm import LSTMModel
+from src.model.submodules.image_head.resnet import ResNet
+from src.model.submodules.text_head.gru import GRUModel
+from src.model.submodules.text_head.lstm import LSTMModel
 
 
 def get_instance(name, parameters_dict):

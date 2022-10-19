@@ -3,3 +3,4 @@ data/
 nohups/
 logs/
 *.pyc
+performance_*.csv

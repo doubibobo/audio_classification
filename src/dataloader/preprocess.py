@@ -163,7 +163,11 @@ def func3():
                         "spectrogram_file": "{}_{}".format(file.stem, str(i).zfill(5)),
                     }
                     data.append(pulse_data)
-                    func5(pulse_data["pulse_label"], pulse_data["spectrogram_file"], data_temp)
+                    # func5(pulse_data["pulse_label"], pulse_data["spectrogram_file"], data_temp)
+                    func6(
+                        pulse_data["data"], 
+                        "{}/{}_{}.png".format(FIGURE_PATH, '_'.join(file.parts[-3:]).replace(".txt", ""), str(i))
+                    )
 
             except Exception:
                 # print(wav)
@@ -171,14 +175,7 @@ def func3():
                 print(data_temp)
 
             # if len(data_temp) >= 7500:
-            #     time = np.arange(0, len(data_temp)) * (1.0)
 
-            #     plt.plot(time, data_temp)
-            #     plt.title("Wavform")
-            #     plt.xlabel("Samples")
-            #     plt.ylabel("Amplitude")
-            #     plt.savefig("{}/{}_{}.png".format(FIGURE_PATH, '_'.join(file.parts[-3:]).replace(".txt", ""), str(i)), dpi=600)
-            #     plt.clf()
 
     np.save(DATA_SAVE_PATH, data)
     print(len(data))
@@ -228,6 +225,17 @@ def func5(label_type, file_name, wav_data):
     )
     plt.clf()
 
+def func6(data_temp, file_name):
+    """画出数据的波形图
+    """
+    time = np.arange(0, len(data_temp)) * (1.0)
+
+    plt.plot(time, data_temp)
+    plt.title("Wavform")
+    plt.xlabel("Samples")
+    plt.ylabel("Amplitude")
+    plt.savefig(file_name, dpi=600)
+    plt.clf()
 
 # func1()
 # func2()

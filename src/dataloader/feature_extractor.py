@@ -25,52 +25,6 @@ classes_labels = list({
 
 types = 'awake diaper hug hungry sleepy uncomfortable'.split()
 
-
-def extract_spectrogram(indexes, selection):
-    """
-    Extracting the Spectrogram for every video
-    提取每条音频的频谱特征图
-    """
-    cmap = plt.get_cmap('inferno')
-    plt.figure(figsize=(10, 10))
-    # 创建对应类的频谱图文件夹
-    for type in types:
-        if not os.path.exists(selection + '/image_data/'):
-            os.makedirs(selection + '/image_data/')
-        if (selection == "train") and (
-                not os.path.exists(selection + '/image_data/' + type)):
-            os.makedirs(selection + '/image_data/' + type)
-            print("the dir of" + selection + "/image_data/" + type +
-                  "is created!")
-        else:
-            print("the dir is exists!")
-
-    for key, value in indexes.items():
-        # 加载15s的音频，转换为单声道（mono）
-        wav, sample_rate = librosa.load(
-            ((bf.filePath + selection + "/" + value + "/" +
-              key) if selection == "train" else key),
-            mono=True,
-            duration=15)
-        plt.specgram(wav,
-                     NFFT=2048,
-                     Fs=2,
-                     Fc=0,
-                     noverlap=128,
-                     cmap=cmap,
-                     sides='default',
-                     mode='default',
-                     scale='dB')
-        plt.axis("off")
-        if selection == "train":
-            plt.savefig(selection + '/image_data/' + value + "/" +
-                        key[:-3].replace(".", "") + ".png")
-        elif selection == "test":
-            plt.savefig(selection + '/image_data/' +
-                        os.path.split(key[:-3])[1] + "png")
-        plt.clf()
-
-
 def extract_features():
     """
     Extracting features form Spectrogram

@@ -18,7 +18,7 @@ import torch
 from packaging import version
 from torch import Tensor, nn
 
-from src.model.fusion_head import logging
+from src.model.submodules.fusion_head import logging
 
 logger = logging.get_logger(__name__)
 

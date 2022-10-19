@@ -10,10 +10,11 @@ import torch
 import torch.multiprocessing
 from optuna.trial import TrialState
 
-os.environ['TORCH_HOME']='/home/data/zhuchuanbo/Documents/pretrained_models'
+os.environ['TORCH_HOME'] = '/home/data/zhuchuanbo/Documents/pretrained_models'
 os.environ['CUDA_VISIBLE_DEVICES'] = "3"
-# os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-# os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:2" # This is crucial for reproducibility
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+os.environ[
+    "CUBLAS_WORKSPACE_CONFIG"] = ":4096:2"  # This is crucial for reproducibility
 
 sys.path.append("/home/data/zhuchuanbo/Documents/competition/JHT")
 print(sys.path)
@@ -21,7 +22,6 @@ print(sys.path)
 from configs.config_for_optuna import Config
 from configs.get_args import parse_args
 from src.utils.get_data import get_data
-from src.utils.train import TrainProcess
 from src.utils.train_tool import (
     check_and_create_dir,
     deep_select_dict,
@@ -104,20 +104,26 @@ def objective(trail):
 
 def do_train(args, trail):
     using_cuda = torch.cuda.is_available()
-
     device = torch.device("cuda" if using_cuda else "cpu")
-
     train_dataloader, valid_dataloader, test_dataloader = get_data(args)
 
-    model = get_class_from_name(args.net_type)(args.model_config)
-    criterion = get_class_from_name(
-        args.criterion["name"])(**args.criterion["init_params"]).to(device)
+    test_losses = [None for _ in range(len(train_dataloader))]
+    test_accuraies = [None for _ in range(len(train_dataloader))]
 
-    visual_params = [p for n, p in list(model.image_head.named_parameters())]
-    other_params = [p for n, p in list(model.named_parameters()) if 'image_head' not in n]
+    for i in range(len(train_dataloader)):
+        "K折交叉验证的结果"
+        model = get_class_from_name(args.net_type)(args.model_config)
+        criterion = get_class_from_name(args.criterion["name"])(**args.criterion["init_params"]).to(device)
 
-    optimizer = get_class_from_name(args.optimizer)(
-        [
+        visual_params = [
+            p for n, p in list(model.image_head.named_parameters())
+        ]
+        other_params = [
+            p for n, p in list(model.named_parameters())
+            if 'image_head' not in n
+        ]
+
+        optimizer = get_class_from_name(args.optimizer)([
             {
                 "params": visual_params,
                 "weight_decay": args.weight_decay["visual"],
@@ -128,17 +134,10 @@ def do_train(args, trail):
                 'weight_decay': args.weight_decay["other"],
                 "lr": args.learning_rate["other"],
             },
-        ],
-    )
+        ], )
 
-    scheduler = get_class_from_name(args.scheduler["name"])(
-        optimizer=optimizer, **args.scheduler["params"])
-    
-    test_losses = [None for _ in range(len(train_dataloader))]
-    test_accuraies = [None for _ in range(len(train_dataloader))]
-    
-    for i in range(len(train_dataloader)):
-        "K折交叉验证的结果"
+        scheduler = get_class_from_name(args.scheduler["name"])(
+            optimizer=optimizer, **args.scheduler["params"])
         train_process = get_class_from_name(args.train_type)(
             args,
             train_dataloader[i],
@@ -152,6 +151,7 @@ def do_train(args, trail):
             scheduler,
             args.log_save_path,
             device=device,
+            cross_validation=i,
         )
 
         if args.test_pretrained_path is None:
@@ -161,7 +161,8 @@ def do_train(args, trail):
                 iteration=0,
                 trail=trail,
             )
-        test_losses[i], test_metrics = train_process.test_process(args.test_pretrained_path)
+        test_losses[i], test_metrics = train_process.test_process(
+            args.test_pretrained_path)
         test_accuraies[i] = test_metrics["accuracy"]
     test_metrics["accuracy"] = np.mean(test_accuraies)
     test_losses = np.mean(test_losses)
@@ -169,9 +170,8 @@ def do_train(args, trail):
 
 
 if __name__ == "__main__":
-    study = optuna.create_study(direction="maximize",
-                                study_name="jht")
-    study.optimize(objective, n_trials=1)
+    study = optuna.create_study(direction="maximize", study_name="jht")
+    study.optimize(objective, n_trials=20)
     pruned_trials = study.get_trials(deepcopy=False,
                                      states=[TrialState.PRUNED])
     complete_trials = study.get_trials(deepcopy=False,

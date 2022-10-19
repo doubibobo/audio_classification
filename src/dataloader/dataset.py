@@ -6,6 +6,7 @@ from torch.utils.data.dataset import Dataset
 import importlib
 import torch.nn.functional as F
 import numpy as np
+from random import sample
 
 import os
 import torch
@@ -62,8 +63,9 @@ class JHTDataset(Dataset, ABC):
     def __init__(
         self,
         image_dir,
-        classes=2,
+        classes=13,
         slices=None,
+        test_mode=False
     ):
         super(JHTDataset, self).__init__()
 
@@ -80,6 +82,7 @@ class JHTDataset(Dataset, ABC):
 
         self.image_label = []
         self.length = 0
+        self.test_mode = test_mode
 
         self.__create_iamge_label_dict()
         
@@ -90,16 +93,26 @@ class JHTDataset(Dataset, ABC):
             data = np.array(self.image_label)
             self.image_label = data[slices]
             self.length = len(slices)
-
+            
+            
     def __create_iamge_label_dict(self):
         image_files = Path("{}".format(self.image_dir))
-        image_files = list(image_files.glob("*/*.png"))
-        for image_file in image_files:
+        if self.test_mode:
+            files_list = list(image_files.glob("*/*.png"))
+        else:
+            files_list = []
+            for dir in list(image_files.glob("*")):
+                sub_files = list(image_files.glob("{}/*.png".format(dir.stem)))
+                if dir.stem not in ["0637", "0638"]:
+                    files_list.extend(sub_files)
+                else:
+                    files_list.extend(sample(sub_files, 3000))       
+        for image_file in files_list:
             self.image_label.append(
                 {
                     "path": str(image_file),
                     # "path": Image.open(os.path.join(image_file)).convert("RGB"),
-                    "label": class_to_label[image_file.parts[-2]],
+                    "label": class_to_label[image_file.parts[-2]] if not self.test_mode else 0,
                 }
             )
             self.length += 1

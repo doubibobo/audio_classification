@@ -114,11 +114,11 @@ def find_and_delete_files(
 
 
 list1, list2 = find_and_delete_files(
-    dataset_name="mosi",
-    model_name="SKEF",
+    dataset_name="JHT",
+    model_name="JHTModel",
     data_flag="",
     reserved_number=10,
-    default_name="bert_aligned.csv"
+    default_name="resnet18_part_samples.csv"
 )
 
 delete_checkpoints(list1)

@@ -6,7 +6,6 @@ import optuna
 import torch
 from src.utils.calculate_metrics import calculate_metrics, print_confusion_matrix
 from src.utils.get_summary import Summary
-from tqdm import tqdm
 
 
 class TrainProcess:
@@ -24,6 +23,7 @@ class TrainProcess:
         schedule,
         summary_root,
         device="cpu",
+        cross_validation=0,
     ):
         self.args = args
 
@@ -36,6 +36,7 @@ class TrainProcess:
         self.criterion = criteria
         self.optimizer = optimizer
         self.schedule = schedule
+        self.cross_validation = cross_validation
 
         self.summary = Summary(summary_root)
 
@@ -145,12 +146,9 @@ class TrainProcess:
                 valid_labels,
                 self.model.module.classifier.fc.out_features,
                 dataset_name=self.args.dataset_name)
-            # print(
-            #     " * Metrics for validation processing: \n {}".format(str(valid_metrics))
-            # )
-            # print("Confusion matrix for valid set:\n")
-            # print_confusion_matrix(valid_labels, valid_predictions,
-            #                        self.model.module.classifier.fc.out_features)
+            print("Confusion matrix for valid set:\n")
+            print_confusion_matrix(valid_labels, valid_predictions,
+                                   self.model.module.classifier.fc.out_features)
 
         return np.mean(valid_losses), valid_metrics
 
@@ -163,7 +161,7 @@ class TrainProcess:
             self.model = torch.load(
                 os.path.join(
                     self.model_root,
-                    "best_model.pth",
+                    "best_model_{}.pth".format(self.cross_validation),
                 ))["state_dict"]
             self.model = self.model.to(self.device)
         self.model.eval()
@@ -190,35 +188,34 @@ class TrainProcess:
                 test_labels,
                 self.model.classifier.fc.out_features,
                 dataset_name=self.args.dataset_name)
-            # print(" * Metrics for test processing: \n {}".format(str(test_metrics)))
-            # print("Confusion matrix for test set:\n")
-            # print_confusion_matrix(test_labels, test_predictions,
-            #                        self.model.classifier.fc.out_features)
+            print("Confusion matrix for test set:\n")
+            print_confusion_matrix(test_labels, test_predictions,
+                                   self.model.classifier.fc.out_features)
 
-            if test_pretrained_path is not None:
-                # 保存特征向量
-                np.save(
-                    "visualization/" + self.args.dataset_name + "/mosi_test_fusion_features.npy",
-                    np.array(features))
-                np.save(
-                    "visualization/" + self.args.dataset_name + "/mosi_test_tv_features.npy",
-                    np.array([feature[0:768] for feature in features]))
-                np.save(
-                    "visualization/" + self.args.dataset_name + "/mosi_test_ta_features.npy",
-                    np.array([feature[768:768 * 2] for feature in features]))
-                np.save(
-                    "visualization/" + self.args.dataset_name + "/mosi_test_kb_features.npy",
-                    np.array(
-                        [feature[768 * 2:768 * 3] for feature in features]))
-                np.save(
-                    "visualization/" + self.args.dataset_name + "/mosi_test_t_features.npy",
-                    np.array(
-                        [feature[768 * 3:768 * 4] for feature in features]))
+            # if test_pretrained_path is not None:
+            #     # 保存特征向量
+            #     np.save(
+            #         "visualization/" + self.args.dataset_name + "/mosi_test_fusion_features.npy",
+            #         np.array(features))
+            #     np.save(
+            #         "visualization/" + self.args.dataset_name + "/mosi_test_tv_features.npy",
+            #         np.array([feature[0:768] for feature in features]))
+            #     np.save(
+            #         "visualization/" + self.args.dataset_name + "/mosi_test_ta_features.npy",
+            #         np.array([feature[768:768 * 2] for feature in features]))
+            #     np.save(
+            #         "visualization/" + self.args.dataset_name + "/mosi_test_kb_features.npy",
+            #         np.array(
+            #             [feature[768 * 2:768 * 3] for feature in features]))
+            #     np.save(
+            #         "visualization/" + self.args.dataset_name + "/mosi_test_t_features.npy",
+            #         np.array(
+            #             [feature[768 * 3:768 * 4] for feature in features]))
 
-                # 保存标签
-                np.save(
-                    "visualization/" + self.args.dataset_name + "/mosi_test_fusion_labels.npy",
-                    np.array(test_labels))
+            #     # 保存标签
+            #     np.save(
+            #         "visualization/" + self.args.dataset_name + "/mosi_test_fusion_labels.npy",
+            #         np.array(test_labels))
 
         return np.mean(test_losses), test_metrics
 
@@ -229,7 +226,7 @@ class TrainProcess:
             self.best_accuracy = metrics["accuracy"]
             model_save_path = os.path.join(
                 self.model_root,
-                "best_model.pth",
+                "best_model_{}.pth".format(self.cross_validation),
             )
             torch.save(
                 {

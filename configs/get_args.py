@@ -3,7 +3,11 @@ import argparse
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--seed", type=int, default=1)
+    parser.add_argument(
+        "--seed", 
+        type=int, 
+        default=1
+    )
     parser.add_argument(
         "--dataset_name",
         type=str,
@@ -11,16 +15,28 @@ def parse_args():
         help="support JHT",
     )
     parser.add_argument(
-        "--category_number", type=int, default=13, help="the categories of the input data."
+        "--category_number", 
+        type=int, 
+        default=13,
+        help="the categories of the input data."
     )
     parser.add_argument(
-        "--pretrained_arch", type=str, default="resnet18", help="text pretrained model."
+        "--pretrained_arch", 
+        type=str,
+        default="resnet18", 
+        help="text pretrained model."
     )
     parser.add_argument(
-        "--model_save_path", type=str, default="checkpoints", help="path to save model."
+        "--model_save_path", 
+        type=str, 
+        default="checkpoints", 
+        help="path to save model."
     )
     parser.add_argument(
-        "--log_save_path", type=str, default="logs", help="path to save log"
+        "--log_save_path", 
+        type=str, 
+        default="logs",
+        help="path to save log"
     )
     parser.add_argument(
         "--res_save_path",
@@ -29,7 +45,10 @@ def parse_args():
         help="path to save model's performance.",
     )
     parser.add_argument(
-        "--num_workers", type=int, default=8, help="num workers of loading data"
+        "--num_workers", 
+        type=int, 
+        default=8, 
+        help="num workers of loading data"
     )
     parser.add_argument(
         '--prefetch', 
@@ -51,6 +70,7 @@ def parse_args():
     parser.add_argument(
         "--test_pretrained_path",
         type=str,
+        # default="/home/data/zhuchuanbo/Documents/competition/JHT/checkpoints/JHT/JHTModel_2022-10-18_10_25/best_model_0.pth",
         default=None,
         help="default mode for train or test",
     )

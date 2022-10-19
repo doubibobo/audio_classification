@@ -23,9 +23,9 @@ import torch
 import torch.utils.checkpoint
 
 from torch import nn, Tensor
-from src.model.fusion_head import logging
+from src.model.submodules.fusion_head import logging
 
-from src.model.fusion_head.activations import ACT2FN
+from src.model.submodules.fusion_head.activations import ACT2FN
 from configs.storge import Storage
 
 logger = logging.get_logger(__name__)
