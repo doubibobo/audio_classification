@@ -3,7 +3,6 @@ import glob
 import os
 import shutil
 
-# work_dir = '/'.join(os.getcwd().split('/')[:-2])
 work_dir = "/".join(os.getcwd().split("/")[:])
 checkpoints_dir = os.path.join(work_dir, "checkpoints")
 logs_dir = os.path.join(work_dir, "logs")
@@ -73,14 +72,14 @@ def find_and_delete_files(
     print(len(data))
 
     data_list = [data[0]]
-    data_list.extend(descending_sort(data[1:], 3)) # 2 or 1 or 3
+    data_list.extend(descending_sort(data[1:], 2))
     print(len(data_list))
 
     saved_checkpoints_list, saved_log_list = [], []
 
     for item in data_list[1 : (reserved_number + 1)]:
-        saved_checkpoints_list.append(item[14]) # 18/19, 12/13
-        saved_log_list.append(item[15])
+        saved_checkpoints_list.append(item[16])
+        saved_log_list.append(item[17])
 
     model_checkpoints_list = glob.glob(
         "{}/{}_*".format(os.path.join(checkpoints_dir, dataset_name), model_name)
@@ -117,8 +116,8 @@ list1, list2 = find_and_delete_files(
     dataset_name="JHT",
     model_name="JHTModel",
     data_flag="",
-    reserved_number=10,
-    default_name="resnet18_part_samples.csv"
+    reserved_number=1,
+    default_name="resnet18_part_samples_01.csv"
 )
 
 delete_checkpoints(list1)

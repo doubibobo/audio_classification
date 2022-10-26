@@ -18,6 +18,8 @@ class LogisticModel(nn.Module):
         logistics = self.dropout_layer(logistics)
         logistics = self.fc(input_feature)
         # 针对分类问题
+        if len(logistics.shape) == 1:
+            logistics = logistics.unsqueeze(dim=-1)
         output = self.softmax(logistics)
         return {
             'predictions': torch.max(output, dim=1)[1],

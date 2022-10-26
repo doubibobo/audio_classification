@@ -34,7 +34,7 @@ class Config:
             visual_lr, visual_wd = 0.1, 0.1
             other_lr, other_wd = 0.1, 0.1
 
-        batch_size = 256
+        batch_size = 32
         feature_droprate = 0.1
         optimizer = "torch.optim.Adam"
 
@@ -45,12 +45,12 @@ class Config:
                 "train_type": "src.utils.train.TrainProcess",
                 "net_type": "src.model.models.resnet.JHTModel",
                 "model_config": {
-                    "pretrained_arch": "resnet50",
+                    "pretrained_arch": "shufflenetv2",
                     "pretrained_path": self.pretrained_models_dir,
                     "classifier_type": "LogisticModel",
                     "classifier_params": {
                         "classes_number": self.category_number,
-                        "input_dim": 1024 * 1 * 1,
+                        "input_dim": 1024 * 7 * 7, # 2048
                         "l2_penalty": 0.0,
                         "dropout_rate": feature_droprate * 1,
                     },
@@ -95,8 +95,9 @@ class Config:
                 "JHT": {
                     "class_number": 13,
                     "criterion": {
-                        # "name": "src.utils.loss.CrossEntropyLoss",
+                        # "name": "src.utils.loss.FocalLoss",
                         "name": "src.utils.loss.ASLSingleLabel",
+                        # "name": "src.utils.loss.PolyLossWithFocal",
                         "init_params": {
                             "reduction": "mean",
                         },

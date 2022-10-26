@@ -14,11 +14,11 @@ def get_data(args):
 
     dataset = get_class_from_name(args.dataset_class)(**data_loader_params)
     data, label = dataset.get_all_data()
-    # 层次划分数据集
-    # split = StratifiedShuffleSplit(n_splits=1,
-    #                                test_size=args.val_ratio,
+    # # 层次划分数据集
+    # split = StratifiedShuffleSplit(n_splits=5,
+    #                                test_size=0.2,
     #                                random_state=args.seed)
-    # 随机采样
+    # # 随机采样
     # split = ShuffleSplit(
     #     n_splits=args.kfolds,
     #     test_size=args.val_ratio,
@@ -32,10 +32,12 @@ def get_data(args):
         print("TRAIN: ", train_index, "TEST:", valid_index)
 
         data_loader_params["slices"] = sorted(train_index)
+        data_loader_params['test_mode'] = False
         train_dataset = get_class_from_name(
             args.dataset_class)(**data_loader_params)
 
         data_loader_params["slices"] = sorted(valid_index)
+        data_loader_params['test_mode'] = False
         val_dataset = get_class_from_name(
             args.dataset_class)(**data_loader_params)
 
@@ -64,12 +66,12 @@ def get_data(args):
         train_loaders.append(train_dataloader)
         valid_loaders.append(val_dataloader)
 
-        data_loader_params['test_mode'] = True
         data_loader_params['slices'] = None
+        data_loader_params['test_mode'] = True
         dataset = get_class_from_name(args.dataset_class)(**data_loader_params)
         sampler = SequentialSampler(dataset)
         test_dataloader = DataLoader(dataset,
-                                     batch_size=args.batch_size * 4,
+                                     batch_size=args.batch_size * 2,
                                      sampler=sampler,
                                      drop_last=False,
                                      pin_memory=True,

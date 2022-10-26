@@ -70,7 +70,7 @@ class JHTDataset(Dataset, ABC):
         super(JHTDataset, self).__init__()
 
         self.transform = transforms.Compose([
-            transforms.Resize(256),
+            transforms.Resize(224),
             transforms.CenterCrop(224),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406],
@@ -86,9 +86,6 @@ class JHTDataset(Dataset, ABC):
 
         self.__create_iamge_label_dict()
         
-        # self.image_label = self.image_label[: 30000]
-        # self.length = len(self.image_label)
-        
         if slices is not None:
             data = np.array(self.image_label)
             self.image_label = data[slices]
@@ -96,7 +93,11 @@ class JHTDataset(Dataset, ABC):
             
             
     def __create_iamge_label_dict(self):
-        image_files = Path("{}".format(self.image_dir))
+        if self.test_mode:
+            # image_files = Path("{}".format(self.image_dir.replace("spectrogram", "test/spectrogram")))
+            image_files = Path("{}".format(self.image_dir))
+        else:
+            image_files = Path("{}".format(self.image_dir))
         if self.test_mode:
             files_list = list(image_files.glob("*/*.png"))
         else:
@@ -106,12 +107,11 @@ class JHTDataset(Dataset, ABC):
                 if dir.stem not in ["0637", "0638"]:
                     files_list.extend(sub_files)
                 else:
-                    files_list.extend(sample(sub_files, 3000))       
+                    files_list.extend(sample(sub_files, 5000))       
         for image_file in files_list:
             self.image_label.append(
                 {
                     "path": str(image_file),
-                    # "path": Image.open(os.path.join(image_file)).convert("RGB"),
                     "label": class_to_label[image_file.parts[-2]] if not self.test_mode else 0,
                 }
             )
@@ -123,8 +123,6 @@ class JHTDataset(Dataset, ABC):
         return (
             {
                 "image_data": self.transform(input_image)
-                # "image_data": data["path"],
-                # "image_path": data["path"],
             },
             F.one_hot(
                 torch.tensor(data["label"]),

@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import torch.nn.functional as F
+from collections import Counter
 
 sys.path.append("/home/data/zhuchuanbo/Documents/competition/JHT")
 print(sys.path)
@@ -19,12 +20,12 @@ from src.utils.get_data import get_data
 from src.utils.train_tool import set_seed
 
 os.environ['TORCH_HOME'] = '/home/data/zhuchuanbo/Documents/pretrained_models'
-os.environ['CUDA_VISIBLE_DEVICES'] = "2"
+os.environ['CUDA_VISIBLE_DEVICES'] = "1"
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:2"  # This is crucial for reproducibility
 
-DATASET_PATH = "/home/data/zhuchuanbo/Documents/competition/JHT/data/TestData"
-DATA_SAVE_PATH = os.path.join(DATASET_PATH, "/Processed/test_data")
+DATASET_PATH = "/home/data/zhuchuanbo/Documents/competition/JHT/data"
+DATA_SAVE_PATH = os.path.join(DATASET_PATH, "TestData")
 SPECTROGRAM_PATH = os.path.join(DATASET_PATH, "Processed/test/spectrogram")
 FIGURE_PATH = os.path.join(DATASET_PATH, "Processed/test/figures")
 
@@ -47,7 +48,10 @@ label_to_class = {
 
 
 # 模型保存路径
-test_pretrained_path = "/home/data/zhuchuanbo/Documents/competition/JHT/checkpoints/JHT/JHTModel_2022-10-18_13_55/best_model_0.pth"
+# test_pretrained_path = "/home/data/zhuchuanbo/Documents/competition/JHT/checkpoints/JHT/JHTModel_2022-10-24_09_07/best_model_4.pth" # this is resnet
+# test_pretrained_path = "/home/data/zhuchuanbo/Documents/competition/JHT/checkpoints/JHT/JHTModel_2022-10-25_13_26/best_model_0.pth" # this is shuffle_v2
+
+test_pretrained_path = "/home/data/zhuchuanbo/Documents/competition/JHT/checkpoints/JHT/JHTModel_2022-10-26_07_24/best_model_0.pth"
 
 # 设置系列参数
 global_args = Config(parse_args()).get_config()
@@ -61,6 +65,8 @@ def test_file_process():
             """
             提取每条音频的频谱特征图
             """
+            if os.path.exists(os.path.join(SPECTROGRAM_PATH, "{}.png".format(file_name))):
+                return;
             cmap = plt.get_cmap('inferno')
             plt.figure(figsize=(10, 10))
             plt.specgram(wav_data,
@@ -147,10 +153,10 @@ def test_file_process():
                 print("{}-{}".format(data_start, data_end))
                 print(data_temp)
 
-    files = Path("{}".format(DATASET_PATH))
-    txt_list = list(files.glob("*/*.txt"))
+    files = Path("{}".format(DATA_SAVE_PATH))
+    txt_list = list(files.glob("*.txt"))
     for file in txt_list:
-        get_data_from_datfile()
+        get_data_from_datfile(file)
 
 
 def get_test_accuracy():
@@ -189,7 +195,8 @@ def get_test_accuracy():
                     predictions[key] = [np.argmax(test_logistic)]
         
         for key, value in predictions.items():
-            # print("{}".format(stats.mode(value)))
-            print("{}-{}-{}".format(key, label_to_class[stats.mode(value)[0][0]], stats.mode(value)[1][0] / len(value)))
+            print("{}".format(Counter(value).most_common()))
+            print("{}: {}: {}".format(key, label_to_class[stats.mode(value)[0][0]], stats.mode(value)[1][0] / len(value)))
             
 get_test_accuracy()
+# test_file_process()
