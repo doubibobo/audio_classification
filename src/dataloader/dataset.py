@@ -94,12 +94,13 @@ class JHTDataset(Dataset, ABC):
             
     def __create_iamge_label_dict(self):
         if self.test_mode:
-            # image_files = Path("{}".format(self.image_dir.replace("spectrogram", "test/spectrogram")))
-            image_files = Path("{}".format(self.image_dir))
+            image_files = Path("{}".format(self.image_dir.replace("spectrogram", "test/spectrogram")))
+            # image_files = Path("{}".format(self.image_dir))
         else:
             image_files = Path("{}".format(self.image_dir))
         if self.test_mode:
-            files_list = list(image_files.glob("*/*.png"))
+            # files_list = list(image_files.glob("*/*.png"))
+            files_list = list(image_files.glob("*.png"))
         else:
             files_list = []
             for dir in list(image_files.glob("*")):

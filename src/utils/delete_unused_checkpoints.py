@@ -116,8 +116,8 @@ list1, list2 = find_and_delete_files(
     dataset_name="JHT",
     model_name="JHTModel",
     data_flag="",
-    reserved_number=1,
-    default_name="resnet18_part_samples_01.csv"
+    reserved_number=100,
+    default_name="all_sum.csv"
 )
 
 delete_checkpoints(list1)

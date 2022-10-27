@@ -50,9 +50,9 @@ label_to_class = {
 
 # 模型保存路径
 # test_pretrained_path = "/home/data/zhuchuanbo/Documents/competition/JHT/checkpoints/JHT/JHTModel_2022-10-24_09_07/best_model_4.pth" # this is resnet
-# test_pretrained_path = "/home/data/zhuchuanbo/Documents/competition/JHT/checkpoints/JHT/JHTModel_2022-10-25_13_26/best_model_0.pth" # this is shuffle_v2
+test_pretrained_path = "/home/data/zhuchuanbo/Documents/competition/JHT/checkpoints/JHT/JHTModel_2022-10-25_13_26/best_model_0.pth" # this is shuffle_v2, using 2000 samples.
 
-test_pretrained_path = "/home/data/zhuchuanbo/Documents/competition/JHT/checkpoints/JHT/JHTModel_2022-10-26_07_24/best_model_0.pth"
+# test_pretrained_path = "/home/data/zhuchuanbo/Documents/competition/JHT/checkpoints/JHT/JHTModel_2022-10-26_07_24/best_model_0.pth" # this is shuffle_v2, too, using 5000 samples.
 
 # 设置系列参数
 global_args = Config(parse_args()).get_config()
@@ -203,5 +203,5 @@ def get_test_accuracy():
             print("{}".format(Counter(value).most_common()))
             print("{}: {}: {}".format(key, label_to_class[stats.mode(value)[0][0]], stats.mode(value)[1][0] / len(value)))
             
-# get_test_accuracy()
-test_file_process()
+# test_file_process()
+get_test_accuracy()
