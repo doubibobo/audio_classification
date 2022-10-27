@@ -3,30 +3,12 @@
 
 #### 数据预处理
 将原始波形数据转化为语谱图（[process_code](src/dataloader/preprocess.py)）
-<figure class="third">
-    <img src="figures/spectrogram/1.png">
-    <img src="figures/spectrogram/2.png">
-    <img src="figures/spectrogram/3.png">
-</figure>
-<figure class="third">
-    <img src="figures/spectrogram/4.png">
-    <img src="figures/spectrogram/5.png">
-    <img src="figures/spectrogram/6.png">
-</figure>
-<figure class="third">
-    <img src="figures/spectrogram/7.png">
-    <img src="figures/spectrogram/8.png">
-    <img src="figures/spectrogram/9.png">
-</figure>
-<figure class="third">
-    <img src="figures/spectrogram/10.png">
-    <img src="figures/spectrogram/11.png">
-    <img src="figures/spectrogram/12.png">
-</figure>
-<figure>
-    <img src="figures/spectrogram/13.png">
-</figure> 
-
+![1](figures/spectrogram/1.png) | ![2](figures/spectrogram/2.png) | ![3](figures/spectrogram/3.png)
+--- | --- | ---
+![4](figures/spectrogram/4.png) | ![5](figures/spectrogram/5.png) | ![6](figures/spectrogram/6.png)
+![7](figures/spectrogram/7.png) | ![8](figures/spectrogram/8.png) | ![9](figures/spectrogram/9.png)
+![10](figures/spectrogram/10.png) | ![11](figures/spectrogram/11.png) | ![12](figures/spectrogram/12.png)
+![13](figures/spectrogram/10.png) |  | 
 #### 训练
 ```bash
 nohup python src/run/run.py > nohups/training.log 2>&1 &
