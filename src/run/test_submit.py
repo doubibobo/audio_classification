@@ -28,6 +28,7 @@ DATASET_PATH = "/home/data/zhuchuanbo/Documents/competition/JHT/data"
 DATA_SAVE_PATH = os.path.join(DATASET_PATH, "TestData")
 SPECTROGRAM_PATH = os.path.join(DATASET_PATH, "Processed/test/spectrogram")
 FIGURE_PATH = os.path.join(DATASET_PATH, "Processed/test/figures")
+NPY_SAVE_PATH = "/home/data/zhuchuanbo/Documents/competition/JHT/data/Processed/test/test_data.npy"
 
 label_to_class = {
     0: '5074',
@@ -56,6 +57,8 @@ test_pretrained_path = "/home/data/zhuchuanbo/Documents/competition/JHT/checkpoi
 # 设置系列参数
 global_args = Config(parse_args()).get_config()
 set_seed(global_args.seed)
+
+test_data = []
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -146,8 +149,9 @@ def test_file_process():
                         "file_name": '/'.join(file.parts[-3:]),
                         "spectrogram_file": "{}_{}".format(file.stem, str(i).zfill(5)),
                     }
-                    plot_spectrogram(pulse_data["spectrogram_file"], data_temp)
-
+                    # plot_spectrogram(pulse_data["spectrogram_file"], data_temp)
+                    test_data.append(pulse_data)
+                    
             except Exception:
                 # print(wav)
                 print("{}-{}".format(data_start, data_end))
@@ -157,6 +161,7 @@ def test_file_process():
     txt_list = list(files.glob("*.txt"))
     for file in txt_list:
         get_data_from_datfile(file)
+    np.save(NPY_SAVE_PATH, test_data)
 
 
 def get_test_accuracy():
@@ -198,5 +203,5 @@ def get_test_accuracy():
             print("{}".format(Counter(value).most_common()))
             print("{}: {}: {}".format(key, label_to_class[stats.mode(value)[0][0]], stats.mode(value)[1][0] / len(value)))
             
-get_test_accuracy()
-# test_file_process()
+# get_test_accuracy()
+test_file_process()
