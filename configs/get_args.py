@@ -47,12 +47,12 @@ def parse_args():
     parser.add_argument(
         "--num_workers", 
         type=int, 
-        default=8, 
+        default=16, 
         help="num workers of loading data"
     )
     parser.add_argument(
         '--prefetch', 
-        default=256, 
+        default=128, 
         type=int, 
         help="use for training duration per worker"
     )

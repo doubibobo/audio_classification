@@ -34,7 +34,7 @@ class Config:
             visual_lr, visual_wd = 0.1, 0.1
             other_lr, other_wd = 0.1, 0.1
 
-        batch_size = 32
+        batch_size = 1024
         feature_droprate = 0.1
         optimizer = "torch.optim.Adam"
 
